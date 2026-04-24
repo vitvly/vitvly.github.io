@@ -1,1 +1,1 @@
-Sitemap: https://vitvly.github.io/sitemap.xml
+Sitemap: https://vitvly.com/sitemap.xml
