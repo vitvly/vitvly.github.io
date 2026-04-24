@@ -1,0 +1,72 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Vit∀ly Vlasov",
+    "section": "",
+    "text": "“Writing is nature’s way of letting you know how sloppy your thinking is.”\n\nGuindon, quoted by Leslie Lamport in Thinking Above the Code"
+  },
+  {
+    "objectID": "posts/restic.html",
+    "href": "posts/restic.html",
+    "title": "Restic on S3",
+    "section": "",
+    "text": "These are some notes made when going through Restic on S3 tutorial.\nIncluded are some changes i had to made, also it’s presented as a sequence of awscli commands - so you need to have it configured."
+  },
+  {
+    "objectID": "posts/restic.html#bucket-creation",
+    "href": "posts/restic.html#bucket-creation",
+    "title": "Restic on S3",
+    "section": "Bucket creation",
+    "text": "Bucket creation\nFirst, let’s create an S3 bucket:\naws s3 mb s3://restic_repo\nPick a custom repo name, as S3 bucket names are global.\nCheck that it exists:\naws s3 ls"
+  },
+  {
+    "objectID": "posts/restic.html#user-creation",
+    "href": "posts/restic.html#user-creation",
+    "title": "Restic on S3",
+    "section": "User creation",
+    "text": "User creation\nCreate user:\naws iam create-user --user-name restic\n{\n    \"User\": {\n        \"Path\": \"/\",\n        \"UserName\": \"restic\",\n        \"UserId\": \"AIDAJ3RF8H2VZL5EH56HP\",\n        \"Arn\": \"arn:aws:iam::123456789012:user/restic\",\n        \"CreateDate\": \"2026-04-09T11:48:24+00:00\"\n    }\n}\nCheck that it’s there:\naws iam list-users"
+  },
+  {
+    "objectID": "posts/restic.html#policies",
+    "href": "posts/restic.html#policies",
+    "title": "Restic on S3",
+    "section": "Policies",
+    "text": "Policies\nNow we need to attach policy. First, create a file named policy.json with the following content:\n{\n    \"Version\": \"2012-10-17\",\n    \"Statement\": [\n        {\n            \"Sid\": \"Statement1\",\n            \"Effect\": \"Allow\",\n            \"Action\": [\n                \"s3:DeleteObject\",\n                \"s3:GetObject\",\n                \"s3:PutObject\"\n            ],\n            \"Resource\": [\n                \"arn:aws:s3:::restic_repo/*\"\n            ]\n        },\n        {\n            \"Sid\": \"Statement2\",\n            \"Effect\": \"Allow\",\n            \"Action\": [\n                \"s3:ListBucket\",\n                \"s3:GetBucketLocation\"\n            ],\n            \"Resource\": [\n                \"arn:aws:s3:::restic_repo\"\n            ]\n        }\n    ]\n}\nThen run:\naws iam create-policy --policy-name restic --policy-document file://policy.json\n\n{\n    \"Policy\": {\n        \"PolicyName\": \"restic\",\n        \"PolicyId\": \"ANPASI35BE82GGCD3Q3RU\",\n        \"Arn\": \"arn:aws:iam::123456789012:policy/restic\",\n        \"Path\": \"/\",\n        \"DefaultVersionId\": \"v1\",\n        \"AttachmentCount\": 0,\n        \"PermissionsBoundaryUsageCount\": 0,\n        \"IsAttachable\": true,\n        \"CreateDate\": \"2026-04-09T12:04:07+00:00\",\n        \"UpdateDate\": \"2026-04-09T12:04:07+00:00\"\n    }\n}\nNow attach it to restic user:\naws iam attach-user-policy --user-name restic --policy-arn arn:aws:iam::123456789012:policy/restic\nBe sure to substitute the ARN with the one you got in previous command’s output.\nNow check that it’s attached:\naws iam list-attached-user-policies --user-name restic\n{\n    \"AttachedPolicies\": [\n        {\n            \"PolicyName\": \"restic\",\n            \"PolicyArn\": \"arn:aws:iam::123456789012:policy/restic\"\n        }\n    ]\n}"
+  },
+  {
+    "objectID": "posts/restic.html#user-access-keys",
+    "href": "posts/restic.html#user-access-keys",
+    "title": "Restic on S3",
+    "section": "User access keys",
+    "text": "User access keys\nNow we will need user’s access keys. Fetch these with:\naws iam create-access-key --user-name restic\nIt will give you something similar to this:\n{\n    \"AccessKey\": {\n        \"UserName\": \"restic\",\n        \"AccessKeyId\": \"AKIADE6K85GD4HNAQ2O3\",\n        \"Status\": \"Active\",\n        \"SecretAccessKey\": \"4ezCiOx9o1df2Edu+L3XOPd2NRW4copgXyzFjaWX\",\n        \"CreateDate\": \"2026-04-09T12:10:15+00:00\"\n    }\n}"
+  },
+  {
+    "objectID": "posts/restic.html#changing-s3-storage-class",
+    "href": "posts/restic.html#changing-s3-storage-class",
+    "title": "Restic on S3",
+    "section": "Changing S3 storage class",
+    "text": "Changing S3 storage class\nIf you want to change storage class for your existing backups, you have to create a bucket lifecycle configuration. Create the following json:\n{\n  \"Rules\": [\n    { \"ID\": \"move_to_standard_ia\",\n      \"Prefix\": \"\",\n      \"Status\": \"Enabled\",\n      \"Transitions\": [\n         { \"Days\": 30,\n           \"StorageClass\": \"STANDARD_IA\"\n          }\n      ]\n    }\n  ]\n}\nFor transitioning into STANDARD_IA, 30 days after creation date is minimum age allowed.\nAnd then put it:\naws s3api put-bucket-lifecycle-configuration --bucket restic_repo --lifecycle-configuration file://s3_lifecycle.json"
+  },
+  {
+    "objectID": "posts/restic.html#pruning",
+    "href": "posts/restic.html#pruning",
+    "title": "Restic on S3",
+    "section": "Pruning",
+    "text": "Pruning\nIf you want to leave the latest backups only, do:\nrestic forget --keep-last 1 --prune\nOne thing that surprised me once was that pruning wasn’t working as expected. Then i’ve noticed that for some reason restic snapshots was showing different values in the Host column. So i did this:\nrestic rewrite --host \"old-host\" --new-host \"new-host\""
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "main",
+    "section": "",
+    "text": "Hi. This is the website!"
+  },
+  {
+    "objectID": "index.html#posts",
+    "href": "index.html#posts",
+    "title": "main",
+    "section": "Posts",
+    "text": "Posts\n\n\n\n\n\nRestic on S3\n\n\n\n\n\nApr 8, 2026\n\n\n\n\n\nNo matching items"
+  }
+]
