@@ -1,0 +1,21 @@
+project:
+  type: website
+
+website:
+  title: "website"
+  navbar:
+    title: "&forall;"
+    search: true
+    pinned: true
+    collapse: true
+    right:
+      - icon: code-slash
+        href: about.qmd
+        text: About
+format:
+  html:
+    theme: flexoki-light.scss
+    syntax-highlighting: flexoki-light.theme
+    css: styles.css
+    toc: true
+    include-after-body: scripts.html

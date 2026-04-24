@@ -1,0 +1,246 @@
+---
+title: "Restic on S3"
+date: "2026-04-08"
+categories: [devops]
+image: "image.jpg"
+
+---
+
+# Intro
+These are some notes made when going through [Restic on S3 tutorial](https://restic.readthedocs.io/en/latest/080_examples.html).
+
+Included are some changes i had to made, also it's presented as a sequence of `awscli` commands - so you need to have it configured.
+
+
+# S3 config
+
+## Bucket creation
+First, let's create an S3 bucket:
+
+```bash
+aws s3 mb s3://restic_repo
+```
+Pick a custom repo name, as S3 bucket names are global.
+
+Check that it exists:
+```bash
+aws s3 ls
+```
+
+## User creation
+Create user:
+```bash
+aws iam create-user --user-name restic
+{
+    "User": {
+        "Path": "/",
+        "UserName": "restic",
+        "UserId": "AIDAJ3RF8H2VZL5EH56HP",
+        "Arn": "arn:aws:iam::123456789012:user/restic",
+        "CreateDate": "2026-04-09T11:48:24+00:00"
+    }
+}
+```
+
+Check that it's there:
+```bash
+aws iam list-users
+```
+
+## Policies
+Now we need to attach policy. First, create a file named `policy.json` with the following content:
+
+```json
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "Statement1",
+			"Effect": "Allow",
+			"Action": [
+				"s3:DeleteObject",
+				"s3:GetObject",
+				"s3:PutObject"
+			],
+			"Resource": [
+				"arn:aws:s3:::restic_repo/*"
+			]
+		},
+		{
+			"Sid": "Statement2",
+			"Effect": "Allow",
+			"Action": [
+				"s3:ListBucket",
+				"s3:GetBucketLocation"
+			],
+			"Resource": [
+				"arn:aws:s3:::restic_repo"
+			]
+		}
+	]
+}
+```
+Then run:
+```bash
+aws iam create-policy --policy-name restic --policy-document file://policy.json
+
+{
+    "Policy": {
+        "PolicyName": "restic",
+        "PolicyId": "ANPASI35BE82GGCD3Q3RU",
+        "Arn": "arn:aws:iam::123456789012:policy/restic",
+        "Path": "/",
+        "DefaultVersionId": "v1",
+        "AttachmentCount": 0,
+        "PermissionsBoundaryUsageCount": 0,
+        "IsAttachable": true,
+        "CreateDate": "2026-04-09T12:04:07+00:00",
+        "UpdateDate": "2026-04-09T12:04:07+00:00"
+    }
+}
+```
+Now attach it to `restic` user:
+```bash
+aws iam attach-user-policy --user-name restic --policy-arn arn:aws:iam::123456789012:policy/restic
+```
+Be sure to substitute the ARN with the one you got in previous command's output.
+
+Now check that it's attached:
+```bash
+aws iam list-attached-user-policies --user-name restic
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "restic",
+            "PolicyArn": "arn:aws:iam::123456789012:policy/restic"
+        }
+    ]
+}
+```
+
+## User access keys
+Now we will need user's access keys. Fetch these with:
+```bash
+aws iam create-access-key --user-name restic
+```
+
+It will give you something similar to this:
+```json
+{
+    "AccessKey": {
+        "UserName": "restic",
+        "AccessKeyId": "AKIADE6K85GD4HNAQ2O3",
+        "Status": "Active",
+        "SecretAccessKey": "4ezCiOx9o1df2Edu+L3XOPd2NRW4copgXyzFjaWX",
+        "CreateDate": "2026-04-09T12:10:15+00:00"
+    }
+}
+```
+
+# Restic init
+Now create a shell script with below contents (replace passwords and secret keys with your values):
+```bash
+export AWS_DEFAULT_REGION="us-east-1"
+export RESTIC_REPOSITORY="s3:s3.us-east-1.amazonaws.com/restic_repo"
+export AWS_ACCESS_KEY_ID="AKIADE6K85GD4HNAQ2O3"
+export AWS_SECRET_ACCESS_KEY="4ezCiOx9o1df2Edu+L3XOPd2NRW4copgXyzFjaWX"
+export RESTIC_PASSWORD="secret_restic_password"
+```
+
+run this script in a new shell or terminal pane. Now you can initialize the restic repo:
+```bash
+restic init
+```
+
+It should tell you something like:
+```bash
+created restic repository 637564f240 at s3:s3.us-east-1.amazonaws.com/restic_repo
+
+Please note that knowledge of your password is required to access
+the repository. Losing your password means that your data is
+irrecoverably lost.
+
+```
+
+# Restic usage
+Now you can create backups. Try:
+```bash
+restic backup ~/Documents
+```
+You can now view existing snapshots with `restic snapshots`.
+
+Please note that it is often prudent to use S3's infrequent access storage tier, which you can enable with:
+```bash
+restic backup ~/Documents -o s3.storage-class=STANDARD_IA
+```
+
+You can check storage classes for your backups with:
+```bash
+aws s3api list-objects --bucket restic_repo --max-items 5
+```
+
+## Changing S3 storage class
+If you want to change storage class for your existing backups, you have to create a bucket lifecycle configuration. Create the following json:
+```json
+{
+  "Rules": [
+    { "ID": "move_to_standard_ia",
+      "Prefix": "",
+      "Status": "Enabled",
+      "Transitions": [
+         { "Days": 30,
+           "StorageClass": "STANDARD_IA"
+          }
+      ]
+    }
+  ]
+}
+
+```
+For transitioning into `STANDARD_IA`, 30 days after creation date is minimum age allowed.
+
+And then put it:
+```bash
+aws s3api put-bucket-lifecycle-configuration --bucket restic_repo --lifecycle-configuration file://s3_lifecycle.json
+```
+
+## Pruning
+If you want to leave the latest backups only, do:
+```bash
+restic forget --keep-last 1 --prune
+```
+One thing that surprised me once was that pruning wasn't working as expected. Then i've noticed that for some reason `restic snapshots` was showing different values in the `Host` column. So i did this:
+
+```bash
+restic rewrite --host "old-host" --new-host "new-host"
+```
+
+# Cleanup
+
+These commands should be run in order to remove all AWS resources allocated for Restic:
+
+First, detach and delete the policy using its ARN:
+```bash
+aws iam detach-user-policy --user-name restic --policy-arn arn:aws:iam::123456789012:policy/restic
+aws iam delete-policy --policy-arn arn:aws:iam::123456789012:policy/restic
+```
+
+Then, delete user's access keys and the user themselves:
+```bash
+aws iam delete-access-key --user-name restic --access-key-id AKIADE6K85GD4HNAQ2O3
+aws iam delete-user --user-name restic
+```
+
+And, finally, remove the bucket:
+```bash
+aws s3 rb --force s3://restic_repo
+
+```
+
+Removal will work if versioning is disabled, you check that via:
+
+```bash
+ aws s3api get-bucket-versioning --bucket restic_repo
+```
+
+

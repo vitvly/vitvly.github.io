@@ -1,0 +1,20 @@
+---
+title: "Vit&forall;ly Vlasov"
+about:
+  template: jolla
+  image: profile.jpg
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://linkedin.com/in/vitvly
+    - icon: github
+      text: Github
+      href: https://github.com/vitvly
+---
+
+> “Writing is nature’s way of letting you know how
+sloppy your thinking is.”
+
+Guindon, quoted by Leslie Lamport in [Thinking Above the Code](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/07/leslie_lamport.pdf)
+
+

@@ -1,0 +1,30 @@
+---
+title: "main"
+toc: false
+format:
+  html:
+    include-in-header:
+      text: |
+        <style>
+        #title-block-header {
+          display: none;
+        }
+        .listing-title {
+          font-size: 1.25rem;
+          font-weight: 600;
+        }
+        </style>
+listing: 
+  - id: latest-posts
+    contents: posts
+    type: default
+    fields: [title, date]
+    max-description-length: 150
+---
+Hi. This is the website!
+
+
+## Posts
+:::{#latest-posts}
+:::
+

@@ -1,0 +1,36 @@
+<script>
+  (function() {
+    var title = document.querySelector('.title');
+    var brand = document.querySelector('.navbar-brand');
+    if (!title || !brand) return;
+    var text = title.textContent.trim();
+    if (text === brand.textContent.trim()) return;
+    var segments = window.location.pathname
+      .split('/').filter(function(s) { return s && s !== 'index.html'; });
+    var folder = segments.length > 1 ? segments[0] : null;
+    var container = brand.parentNode;
+    function makeSep() {
+      var s = document.createElement('span');
+      s.className = 'navbar-page-sep';
+      s.textContent = '/';
+      return s;
+    }
+    var sep1 = makeSep();
+    container.insertBefore(sep1, brand.nextSibling);
+    var anchor = sep1;
+    if (folder) {
+      var folderSpan = document.createElement('span');
+      folderSpan.className = 'navbar-page-folder';
+      folderSpan.textContent = folder;
+      container.insertBefore(folderSpan, anchor.nextSibling);
+      anchor = folderSpan;
+      var sep2 = makeSep();
+      container.insertBefore(sep2, anchor.nextSibling);
+      anchor = sep2;
+    }
+    var span = document.createElement('span');
+    span.className = 'navbar-page-title';
+    span.textContent = text;
+    container.insertBefore(span, anchor.nextSibling);
+  })();
+</script>

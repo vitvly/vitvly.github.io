@@ -1,0 +1,210 @@
+/*-- scss:defaults --*/
+
+// =============================================================
+// Flexoki Light — custom.scss for Quarto websites
+// https://stephango.com/flexoki
+//
+// Usage in _quarto.yml:
+//   format:
+//     html:
+//       theme: [default, flexoki-light.scss]
+// =============================================================
+
+// --- Base tones ---
+$paper:      #FFFCF0;
+$black:      #100F0F;
+$base-950:   #1C1B1A;
+$base-900:   #282726;
+$base-850:   #343331;
+$base-800:   #403E3C;
+$base-700:   #575653;
+$base-600:   #6F6E69;
+$base-500:   #878580;
+$base-300:   #B7B5AC;
+$base-200:   #CECDC3;
+$base-150:   #DAD8CE;
+$base-100:   #E6E4D9;
+$base-50:    #F2F0E5;
+
+// --- Accent colours (600 values for light themes) ---
+$red:        #AF3029;
+$orange:     #BC5215;
+$yellow:     #AD8301;
+$green:      #66800B;
+$cyan:       #24837B;
+$blue:       #205EA6;
+$purple:     #5E409D;
+$magenta:    #A02F6F;
+
+// --- Bootstrap overrides ---
+$body-bg:               $paper;
+$body-color:            $black;
+$link-color:            $blue;
+$link-hover-color:      darken($blue, 10%);
+
+// Navbar
+$navbar-bg:             $base-100;
+$navbar-fg:             $black;
+$navbar-hl:             $blue;
+
+// Sidebar
+$sidebar-bg:            $base-50;
+$sidebar-fg:            $base-600;
+$sidebar-hl:            $blue;
+
+// TOC
+$toc-color:             $base-600;
+$toc-active-color:      $blue;
+
+// Code
+$code-bg:               $base-50;
+$code-color:            $black;
+$code-block-bg:         $base-50;
+$code-block-border-left: 3px solid $base-200;
+
+// Inline code
+$code-block-bg-alpha:   1;
+
+// Fonts
+$font-family-sans-serif: "Inter", system-ui, -apple-system, sans-serif !default;
+$font-family-monospace:  "JetBrains Mono", "Fira Code", "Cascadia Code", monospace !default;
+$font-size-base:         1rem !default;
+$line-height-base:       1.7 !default;
+
+// Headings
+$headings-font-weight:   600 !default;
+
+// Cards, tables, borders
+$card-bg:               $base-50;
+$card-border-color:     $base-200;
+$table-border-color:    $base-150;
+$border-color:          $base-200;
+$input-border-color:    $base-200;
+
+// Callout colours
+$callout-color-note:    $blue;
+$callout-color-tip:     $cyan;
+$callout-color-warning: $orange;
+$callout-color-caution: $yellow;
+$callout-color-important: $red;
+
+
+$navbar-bg: $paper;              // same as page background
+$navbar-fg: $base-600;           // muted text, not black
+$navbar-hl: $blue;               // hover color stays useful
+
+/*-- scss:rules --*/
+
+// Soften selection highlight
+::selection {
+  background: rgba($blue, 0.15);
+}
+
+// Subtle border beneath navbar
+.navbar {
+  border-bottom: 1px solid $base-200;
+}
+
+// Slightly warmer sidebar
+.sidebar nav[role="doc-toc"] ul > li > a.active {
+  border-left-color: $blue;
+}
+
+// Give code blocks a gentle inset feel
+div.sourceCode {
+  border-radius: 6px;
+  border: 1px solid $base-200;
+}
+
+// Style callout blocks with Flexoki accent colours
+.callout-note {
+  border-left-color: $blue;
+}
+.callout-tip {
+  border-left-color: $cyan;
+}
+.callout-warning {
+  border-left-color: $orange;
+}
+.callout-caution {
+  border-left-color: $yellow;
+}
+.callout-important {
+  border-left-color: $red;
+}
+
+// Footnote and figure caption styling
+.footnote-ref, figcaption {
+  color: $base-600;
+}
+
+.navbar {
+  border-bottom: none;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  min-height: unset;
+  font-size: 13px;
+}
+
+// shrink the site title
+.navbar-title {
+  font-size: 32px;
+  font-weight: 500;
+  color: $base-600;
+}
+
+// tone down nav links
+.navbar-nav .nav-link {
+  color: $base-500;
+  font-size: 16px;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  &:hover { color: $blue; }
+}
+
+// reduce logo size if you have one
+.navbar-logo {
+  max-height: 20px;
+}
+
+// make the search icon subtle
+.navbar .aa-DetachedSearchButton {
+  border: none;
+  background: transparent;
+}
+.navbar-brand-container {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand-container .navbar-title {
+  line-height: 1;
+}
+
+.navbar-page-sep,
+.navbar-page-folder,
+.navbar-page-title {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.navbar-page-sep {
+  color: $base-300;
+  margin: 0 0.4em;
+}
+
+.navbar-page-folder {
+  color: $base-500;
+  font-weight: 400;
+}
+
+.navbar-page-title {
+  color: $base-600;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40vw;
+}

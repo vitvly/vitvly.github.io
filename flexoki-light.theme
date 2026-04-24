@@ -1,0 +1,141 @@
+{
+    "metadata": {
+        "name": "Flexoki Light",
+        "revision": 1,
+        "author": "Based on Flexoki by Steph Ango (stephango.com/flexoki)",
+        "license": "MIT"
+    },
+    "text-styles": {
+        "Normal": {
+            "text-color": "#100F0F"
+        },
+        "Keyword": {
+            "text-color": "#AF3029",
+            "bold": true
+        },
+        "Function": {
+            "text-color": "#205EA6"
+        },
+        "Variable": {
+            "text-color": "#100F0F"
+        },
+        "ControlFlow": {
+            "text-color": "#AF3029",
+            "bold": true
+        },
+        "Operator": {
+            "text-color": "#100F0F"
+        },
+        "BuiltIn": {
+            "text-color": "#24837B"
+        },
+        "Extension": {
+            "text-color": "#5E409D"
+        },
+        "Preprocessor": {
+            "text-color": "#A02F6F"
+        },
+        "Attribute": {
+            "text-color": "#AD8301"
+        },
+        "Char": {
+            "text-color": "#66800B"
+        },
+        "SpecialChar": {
+            "text-color": "#BC5215"
+        },
+        "String": {
+            "text-color": "#66800B"
+        },
+        "VerbatimString": {
+            "text-color": "#66800B"
+        },
+        "SpecialString": {
+            "text-color": "#24837B"
+        },
+        "Import": {
+            "text-color": "#A02F6F"
+        },
+        "DataType": {
+            "text-color": "#5E409D"
+        },
+        "DecVal": {
+            "text-color": "#BC5215"
+        },
+        "BaseN": {
+            "text-color": "#BC5215"
+        },
+        "Float": {
+            "text-color": "#BC5215"
+        },
+        "Constant": {
+            "text-color": "#BC5215"
+        },
+        "Comment": {
+            "text-color": "#B7B5AC",
+            "italic": true
+        },
+        "Documentation": {
+            "text-color": "#878580",
+            "italic": true
+        },
+        "Annotation": {
+            "text-color": "#AD8301",
+            "italic": true
+        },
+        "CommentVar": {
+            "text-color": "#878580",
+            "italic": true
+        },
+        "Other": {
+            "text-color": "#24837B"
+        },
+        "Information": {
+            "text-color": "#205EA6"
+        },
+        "Warning": {
+            "text-color": "#BC5215"
+        },
+        "Alert": {
+            "text-color": "#AF3029",
+            "bold": true
+        },
+        "Error": {
+            "text-color": "#AF3029",
+            "bold": true
+        },
+        "Region": {
+            "text-color": "#5E409D"
+        }
+    },
+    "editor-colors": {
+        "background-color": "#F2F0E5",
+        "code-folding": "#DAD8CE",
+        "bracket-matching": "#E6E4D9",
+        "current-line": "#F2F0E5",
+        "icon-border": "#F2F0E5",
+        "indentation-line": "#DAD8CE",
+        "line-numbers": "#B7B5AC",
+        "current-line-number": "#6F6E69",
+        "mark-bookmark": "#205EA6",
+        "mark-breakpoint-active": "#AF3029",
+        "mark-breakpoint-reached": "#AD8301",
+        "mark-breakpoint-disabled": "#A02F6F",
+        "mark-execution": "#66800B",
+        "mark-warning": "#BC5215",
+        "mark-error": "#AF3029",
+        "modified-lines": "#BC5215",
+        "replace-highlight": "#AD8301",
+        "saved-lines": "#66800B",
+        "search-highlight": "#AD8301",
+        "selection": "#E6E4D9",
+        "separator": "#DAD8CE",
+        "spell-checking": "#AF3029",
+        "tab-marker": "#DAD8CE",
+        "template-background": "#F2F0E5",
+        "template-placeholder": "#E6E4D9",
+        "template-focused-placeholder": "#DAD8CE",
+        "template-read-only-placeholder": "#F2F0E5",
+        "word-wrap-marker": "#E6E4D9"
+    }
+}
