@@ -1,5 +1,5 @@
 ---
-title: "Vit&forall;ly Vlasov"
+title: "About"
 about:
   template: jolla
   image: profile.jpg
@@ -10,6 +10,16 @@ about:
     - icon: github
       text: Github
       href: https://github.com/vitvly
+format:
+  html:
+    include-in-header:
+      text: |
+        <style>
+        #title-block-header {
+          display: none;
+        }
+        </style>
+
 ---
 
 > “Writing is nature’s way of letting you know how
